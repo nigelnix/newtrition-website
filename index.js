@@ -28,7 +28,7 @@ app.use(cors());
 
 // database connection
 mongoose
-.connect(DBurl)
+.connect(DBurl, { useNewUrlParser: true, useUnifiedTopology: true })
 .then((req, res) => {
   console.log("DB Connected Successfully");
 })
@@ -51,6 +51,8 @@ app.post(`/register`, (req, res) => {
           user.password = hashPass;
           
           try {
+            console.log("User data to be saved:", user);
+            
             let doc = await userModel.create(user);
             res.status(201).send({ message: "User registered" });
           } catch (err) {
