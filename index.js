@@ -11,13 +11,14 @@ import { trackingModel } from "./models/trackingModel.js";
 import { verifyToken } from "./verifyToken.js";
 import path from "path";
 
-app.use(express.static(path.join(__dirname, "dist")));
 
 const secretKey = process.env.SECRET_KEY;
 const DBurl = process.env.MONGODB_URL;
 const port = process.env.PORT || 3000;
 // initiating express for endpoints
 const app = express();
+
+app.use(express.static(path.join(__dirname, "dist")));
 
 // middleware to take care of parse and stringify and data chunking in the background with http
 app.use(express.json());
