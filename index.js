@@ -11,6 +11,7 @@ import { trackingModel } from "./models/trackingModel.js";
 import { verifyToken } from "./verifyToken.js";
 import path from "path";
 import { fileURLToPath } from 'url';
+import moment from "moment";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -52,7 +53,7 @@ app.post(`/register`, (req, res) => {
           
           try {
             console.log("User data to be saved:", user);
-            
+
             let doc = await userModel.create(user);
             res.status(201).send({ message: "User registered" });
           } catch (err) {
@@ -154,45 +155,21 @@ app.post(`/tracking`, verifyToken, async (req, res) => {
 });
 
 // endpoint to fetch all foods eaten by a person
-// endpoint to fetch all foods eaten by a person
 
 app.get(`/tracking/:userid/:date`, async (req, res) => {
   let userid = req.params.userid;
-  console.log("Received Date (before conversion):", req.params.date);
-  let date = new Date(req.params.date);
-  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-  console.log("Converted Date (after conversion):", date);
-  
-  // Format the date with leading zeros using toLocaleDateString
-  let strDate = date.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-  
+  let date = moment.utc(req.params.date).startOf('day'); // Convert to UTC and start of day
   try {
-    console.log("Stored Date (before conversion):", strDate);
     let foods = await trackingModel
-    .find({ userId: userid, eatenDate: strDate })
-    .populate("userId")
-    .populate("foodId");
+      .find({ userId: userid, eatenDate: date })
+      .populate("userId")
+      .populate("foodId");
     res.send(foods);
-    
-    console.log(
-      "UserID: ",
-      userid,
-      "Raw Date: ",
-      date,
-      "Formatted Date: ",
-      strDate,
-      "Formatted Foods: ",
-      foods
-      );
-    } catch (err) {
-      console.log(err);
-      res.status(500).send({ message: "Some Problem in getting the food" });
-    }
-  });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "Some Problem in getting the food" });
+  }
+});
   
   app.use(express.static(path.join(__dirname, "dist")));
   // starting the server
