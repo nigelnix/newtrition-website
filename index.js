@@ -10,7 +10,9 @@ import { foodModel } from "./models/foodModel.js";
 import { trackingModel } from "./models/trackingModel.js";
 import { verifyToken } from "./verifyToken.js";
 import path from "path";
+import { fileURLToPath } from 'url';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const secretKey = process.env.SECRET_KEY;
 const DBurl = process.env.MONGODB_URL;
