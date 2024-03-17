@@ -20,7 +20,6 @@ const port = process.env.PORT || 3000;
 // initiating express for endpoints
 const app = express();
 
-app.use(express.static(path.join(__dirname, "dist")));
 
 // middleware to take care of parse and stringify and data chunking in the background with http
 app.use(express.json());
@@ -29,13 +28,13 @@ app.use(cors());
 
 // database connection
 mongoose
-  .connect(DBurl)
-  .then((req, res) => {
-    console.log("DB Connected Successfully");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+.connect(DBurl)
+.then((req, res) => {
+  console.log("DB Connected Successfully");
+})
+.catch((err) => {
+  console.log(err);
+});
 
 
 // const frontend = process.env.FRONTEND_URL;
@@ -44,13 +43,13 @@ mongoose
 // endpoint for registering new user
 app.post(`/register`, (req, res) => {
   let user = req.body;
-
+  
   bcrypt.genSalt(10, (err, salt) => {
     if (!err) {
       bcrypt.hash(user.password, salt, async (err, hashPass) => {
         if (!err) {
           user.password = hashPass;
-
+          
           try {
             let doc = await userModel.create(user);
             res.status(201).send({ message: "User registered" });
@@ -67,7 +66,7 @@ app.post(`/register`, (req, res) => {
 // endpoint for login
 app.post(`/login`, async (req, res) => {
   let userCred = req.body;
-
+  
   try {
     const user = await userModel.findOne({ email: userCred.email });
     if (user !== null) {
@@ -111,7 +110,7 @@ app.get(`/foods`, verifyToken, async (req, res) => {
 // endpoint to add a food item
 app.post(`/foods`, verifyToken, async (req, res) => {
   let food = req.body;
-
+  
   try {
     let doc = await foodModel.create(food);
     res.status(201).send({ message: "Food Added to DB" });
@@ -158,25 +157,25 @@ app.post(`/tracking`, verifyToken, async (req, res) => {
 app.get(`/tracking/:userid/:date`, async (req, res) => {
   let userid = req.params.userid;
   console.log("Received Date (before conversion):", req.params.date);
-let date = new Date(req.params.date);
-date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-console.log("Converted Date (after conversion):", date);
-
+  let date = new Date(req.params.date);
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  console.log("Converted Date (after conversion):", date);
+  
   // Format the date with leading zeros using toLocaleDateString
   let strDate = date.toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   });
-
+  
   try {
     console.log("Stored Date (before conversion):", strDate);
     let foods = await trackingModel
-      .find({ userId: userid, eatenDate: strDate })
-      .populate("userId")
-      .populate("foodId");
+    .find({ userId: userid, eatenDate: strDate })
+    .populate("userId")
+    .populate("foodId");
     res.send(foods);
-
+    
     console.log(
       "UserID: ",
       userid,
@@ -186,14 +185,16 @@ console.log("Converted Date (after conversion):", date);
       strDate,
       "Formatted Foods: ",
       foods
-    );
-  } catch (err) {
-    console.log(err);
-    res.status(500).send({ message: "Some Problem in getting the food" });
-  }
-});
-
-// starting the server
-app.listen(port, () => {
-  console.log(`Server up and running on port: ${port}`);
-});
+      );
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({ message: "Some Problem in getting the food" });
+    }
+  });
+  
+  app.use(express.static(path.join(__dirname, "dist")));
+  // starting the server
+  app.listen(port, () => {
+    console.log(`Server up and running on port: ${port}`);
+  });
+  
