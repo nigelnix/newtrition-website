@@ -29,7 +29,7 @@ app.use(cors());
 
 // database connection
 mongoose
-.connect(DBurl, { useUnifiedTopology: true })
+.connect(DBurl)
 .then((req, res) => {
   console.log("DB Connected Successfully");
 })
