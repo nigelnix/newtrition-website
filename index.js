@@ -144,6 +144,9 @@ app.get(`/foods/:name`, verifyToken, async (req, res) => {
 // endpoint for tracking food + quantity
 app.post(`/tracking`, verifyToken, async (req, res) => {
   let trackData = req.body;
+  const formattedEatenDate = moment().format("DD[padded]");
+
+  trackData.eatenDate = formattedEatenDate;
   try {
     let data = await trackingModel.create(trackData);
     console.log("Tracking route data from server", data);
