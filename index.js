@@ -144,7 +144,7 @@ app.get(`/foods/:name`, verifyToken, async (req, res) => {
 // endpoint for tracking food + quantity
 app.post(`/tracking`, verifyToken, async (req, res) => {
   let trackData = req.body;
-  const formattedEatenDate = moment().format("DD[padded]");
+  const formattedEatenDate = moment().format("DD/MM/YYYY");
 
   trackData.eatenDate = formattedEatenDate;
   try {
