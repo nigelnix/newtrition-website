@@ -21,10 +21,10 @@ const trackingSchema = mongoose.Schema(
       fibre:Number,
      
   },
-  eatenDate: {
-    type: Date,
-    default: () => Date.now(), // Set default to current date in UTC
-  },
+    eatenDate: {
+      type: String,
+      default: new Date().toLocaleDateString(),
+    },
     quantity: {
       type: Number,
       min: 1,
