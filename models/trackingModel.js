@@ -22,8 +22,8 @@ const trackingSchema = mongoose.Schema(
      
   },
   eatenDate: {
-    type: Date, // Change the type to Date
-    default: Date.now, // Use default value of current date and time
+    type: String,
+    required: true,
   },
     quantity: {
       type: Number,
