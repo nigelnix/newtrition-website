@@ -165,17 +165,23 @@ app.get(`/tracking/:userid/:date`, async (req, res) => {
     $gte: moment(req.params.date, "DD/MM/YYYY").startOf('day').toDate(),
     $lte: moment(req.params.date, "DD/MM/YYYY").endOf('day').toDate()
   };
-  console.log("Date sent to backend", date)
+  console.log("Date sent to backend", date);
+
   try {
     let foods = await trackingModel
-    .find({ userId: userid, eatenDate: { $gte: date.$gte, $lte: date.$lte } })
-
+      .find({ userId: userid, eatenDate: { $gte: date.$gte, $lte: date.$lte } })
       .populate("userId")
       .populate("foodId");
+      
+    if (foods.length === 0) {
+      console.log("No tracking data found for user ID:", userid, "and date:", req.params.date);
+      return res.status(404).send({ message: "No tracking data found" });
+    }
+    
     res.send(foods);
   } catch (err) {
-    console.log(err);
-    res.status(500).send({ message: "Some Problem in getting the food" });
+    console.log("Error fetching tracking data:", err);
+    res.status(500).send({ message: "Error fetching tracking data" });
   }
 });
   
