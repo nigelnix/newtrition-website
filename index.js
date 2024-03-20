@@ -158,7 +158,7 @@ app.post(`/tracking`, verifyToken, async (req, res) => {
 
 app.get(`/tracking/:userid/:date`, async (req, res) => {
   let userid = req.params.userid;
-  let date = moment.utc(req.params.date, "YYYY-MM-DD").startOf('day'); // Convert to UTC and start of day
+  let date = moment.utc(req.params.date, "DD/MM/YYYY").startOf('day'); // Convert to UTC and start of day
   console.log("Date sent to backend", date)
   try {
     let foods = await trackingModel
