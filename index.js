@@ -144,9 +144,6 @@ app.get(`/foods/:name`, verifyToken, async (req, res) => {
 // endpoint for tracking food + quantity
 app.post(`/tracking`, verifyToken, async (req, res) => {
   let trackData = req.body;
-  const formattedEatenDate = moment().format("DD/MM/YYYY");
-
-  trackData.eatenDate = formattedEatenDate;
   try {
     let data = await trackingModel.create(trackData);
     console.log("Tracking route data from server", data);
@@ -161,27 +158,17 @@ app.post(`/tracking`, verifyToken, async (req, res) => {
 
 app.get(`/tracking/:userid/:date`, async (req, res) => {
   let userid = req.params.userid;
-  let date = {
-    $gte: moment(req.params.date, "DD/MM/YYYY").startOf('day').toDate(),
-    $lte: moment(req.params.date, "DD/MM/YYYY").endOf('day').toDate()
-  };
-  console.log("Date sent to backend", date);
-
+  let date = moment.utc(req.params.date, "YYYY-MM-DD").startOf('day'); // Convert to UTC and start of day
+  console.log("Date sent to backend", date)
   try {
     let foods = await trackingModel
-      .find({ userId: userid, eatenDate: { $gte: date.$gte, $lte: date.$lte } })
+      .find({ userId: userid, eatenDate: date })
       .populate("userId")
       .populate("foodId");
-      
-    if (foods.length === 0) {
-      console.log("No tracking data found for user ID:", userid, "and date:", req.params.date);
-      return res.status(404).send({ message: "No tracking data found" });
-    }
-    
     res.send(foods);
   } catch (err) {
-    console.log("Error fetching tracking data:", err);
-    res.status(500).send({ message: "Error fetching tracking data" });
+    console.log(err);
+    res.status(500).send({ message: "Some Problem in getting the food" });
   }
 });
   
