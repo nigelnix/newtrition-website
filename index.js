@@ -158,8 +158,10 @@ app.post(`/tracking`, verifyToken, async (req, res) => {
 
 app.get(`/tracking/:userid/:date`, verifyToken,  async (req, res) => {
   let userid = req.params.userid;
+  const receivedDate = req.params.date; // Log here
+  console.log("Received date from request:", receivedDate);
   let date = moment.utc(req.params.date, "DD/MM/YYYY").startOf('day'); // Convert to UTC and start of day
-  console.log("Date sent to backend", date)
+  console.log("Formatted date for query:", date);
   try {
     let foods = await trackingModel
       .find({ userId: userid, eatenDate: date })
